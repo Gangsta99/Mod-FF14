@@ -1,10 +1,6 @@
 {
-  "FF14COMBO-F_F14_TEST_CARD.title": "FF14 Test Card",
-  "FF14COMBO-F_F14_TEST_CARD.description": "Test card. NL Logs a message when played.",
   "FF14COMBO-FAST_BLADE_CARD.title": "先锋剑",
   "FF14COMBO-FAST_BLADE_CARD.description": "造成!D!点伤害。附加2点活力。获得连击1层",
-  "FF14COMBO-OPENER_CARD.title": "Opener",
-  "FF14COMBO-OPENER_CARD.description": "Deal !D! damage.",
   "FF14COMBO-RIOT_BLADE_CARD.title": "暴怒剑",
   "FF14COMBO-RIOT_BLADE_CARD.description": "造成!D!点伤害。附加2点活力。获得连击1层"
 }

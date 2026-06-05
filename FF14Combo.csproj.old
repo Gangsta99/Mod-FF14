@@ -19,15 +19,15 @@
     <ItemGroup Condition="Exists('$(Sts2DataDir)')">
         <Reference Include="0Harmony">
             <HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath>
-            <Private>true</Private>
+            <Private>false</Private>
         </Reference>
         <Reference Include="SmartFormat">
             <HintPath>$(Sts2DataDir)/SmartFormat.dll</HintPath>
-            <Private>true</Private>
+            <Private>false</Private>
         </Reference>
         <Reference Include="sts2">
             <HintPath>$(Sts2DataDir)/sts2.dll</HintPath>
-            <Private>true</Private>
+            <Private>false</Private>
         </Reference>
     </ItemGroup>
 
@@ -36,7 +36,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Alchyr.Sts2.BaseLib" Version="*" PrivateAssets="All" GeneratePathProperty="true" />
+        <PackageReference Include="Alchyr.Sts2.BaseLib" Version="*" PrivateAssets="All" />
         <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="All" />
         <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="*" />
         <!-- Generates a .pck file when building if only using simple assets. May not work on all setups. Uncomment to test. -->
@@ -83,13 +83,6 @@
         <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
     </Target>
 
-    <Target Name="CopyBaseLibToModsFolderOnBuild" AfterTargets="PostBuildEvent" Condition="'$(PkgAlchyr_Sts2_BaseLib)' != ''">
-        <Message Text="Copying BaseLib dependency to mods folder." Importance="high" />
-        <Copy SourceFiles="$(PkgAlchyr_Sts2_BaseLib)\lib\net9.0\BaseLib.dll" DestinationFolder="$(ModsPath)BaseLib/" />
-        <Copy SourceFiles="$(PkgAlchyr_Sts2_BaseLib)\Content\BaseLib.json" DestinationFolder="$(ModsPath)BaseLib/" />
-        <Copy SourceFiles="$(PkgAlchyr_Sts2_BaseLib)\Content\BaseLib.pck" DestinationFolder="$(ModsPath)BaseLib/" />
-    </Target>
-
     <Target Name="CopyQuickPck" AfterTargets="PackPck" Condition="Exists('$(PckPackerOutputPath)') And '$(PckPackerSkipped)' != 'true'">
         <Message Text="Copying quick .pck to mods folder." Importance="high" />
         <Copy SourceFiles="$(PckPackerOutputPath)" DestinationFolder="$(ModsPath)/$(MSBuildProjectName)" />
@@ -97,18 +90,6 @@
 
     <Target Name="NeedGodotForPublish" BeforeTargets="Publish">
         <Error Text=" Godot path must be set up before publishing; Godot not found at path '$(GodotPath)'. Check Directory.Build.props file." Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')" />
-    </Target>
-
-    <Target Name="CopyExternalAssembliesForGodotPublish" BeforeTargets="GodotPublish" Condition="'$(IsInnerGodotExport)' != 'true'">
-        <ItemGroup>
-            <GodotPublishReference Include="$(Sts2DataDir)\0Harmony.dll" Condition="Exists('$(Sts2DataDir)\0Harmony.dll')" />
-            <GodotPublishReference Include="$(Sts2DataDir)\SmartFormat.dll" Condition="Exists('$(Sts2DataDir)\SmartFormat.dll')" />
-            <GodotPublishReference Include="$(Sts2DataDir)\sts2.dll" Condition="Exists('$(Sts2DataDir)\sts2.dll')" />
-            <GodotPublishReference Include="$(PkgAlchyr_Sts2_BaseLib)\lib\net9.0\BaseLib.dll" Condition="'$(PkgAlchyr_Sts2_BaseLib)' != '' And Exists('$(PkgAlchyr_Sts2_BaseLib)\lib\net9.0\BaseLib.dll')" />
-        </ItemGroup>
-        <Message Text="Copying external assemblies for Godot publish scan." Importance="high" />
-        <Copy SourceFiles="@(GodotPublishReference)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" />
-        <Copy SourceFiles="@(GodotPublishReference)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" Condition="'$(PublishDir)' != ''" />
     </Target>
 
     <Target Name="GodotPublish" AfterTargets="Publish" Condition="'$(GodotPath)' != '' and Exists('$(GodotPath)') and '$(IsInnerGodotExport)' != 'true'">

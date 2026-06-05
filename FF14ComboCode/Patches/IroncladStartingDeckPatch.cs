@@ -12,8 +12,10 @@ public static class IroncladStartingDeckPatch
     {
         var deck = __result.ToList();
         deck.Add(ModelDb.Card<OpenerCard>());
+        deck.Add(ModelDb.Card<FastBladeCard>());
+        deck.Add(ModelDb.Card<RiotBladeCard>());
         __result = deck;
 
-        MainFile.Logger.Info("Added Opener to Ironclad starting deck.");
+        MainFile.Logger.Info("Added Opener, Fast Blade, and Riot Blade to Ironclad starting deck.");
     }
 }

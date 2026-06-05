@@ -1,0 +1,444 @@
+# FF14 MOD - STS2 原生实现字段提取
+
+主题：每获得 n 层状态/能力，就激活 n 层某能力/状态
+
+来源：
+- 本机 STS2 原生库：`D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64\sts2.dll`
+- BaseLib：`C:\Users\franc\.nuget\packages\alchyr.sts2.baselib\3.1.8\lib\net9.0\BaseLib.dll`
+- 反射时间：2026-06-04
+
+说明：这里的“状态/能力”在 STS2 原生逻辑中主要对应 `PowerModel`，而不是 `CardType.Status`。`CardType.Status` 是卡牌类型；战斗中可叠层、可触发、可作为 Buff/Debuff 的状态/能力统一走 `PowerModel`。
+
+## 核心结论
+
+“每获得 n 层 A，就激活 n 层 B”的原生实现应以 `PowerModel.AfterPowerAmountChanged` 为主钩子。
+
+推荐逻辑：
+
+1. 监听所有 Power 层数变化。
+2. 判断变化对象是否为源状态/能力 A。
+3. 判断 `amount > 0`，只响应获得层数，不响应减少/清除。
+4. 判断目标归属，例如 `power.Owner == Owner` 或 `power.Owner.Side == Owner.Side`。
+5. 用本次变化量 `amount` 作为 B 的激活/给予层数。
+6. 通过 `PowerCmd.Apply<TPower>` 或 BaseLib 的 `CommonActions.ApplySelf<TPower>` 走原生叠层流程。
+
+关键字段：
+
+```csharp
+PowerModel power
+decimal amount
+Creature applier
+CardModel cardSource
+```
+
+其中 `amount` 是本次层数变化量；`PowerModel.Amount` 是当前最终层数。
+
+## 原生字段库
+
+### 卡牌分类字段
+
+`CardModel` 中与卡牌定义直接相关的字段/属性：
+
+```csharp
+CardType Type
+CardRarity Rarity
+int CanonicalEnergyCost
+bool HasEnergyCostX
+int CanonicalStarCost
+int CurrentStarCost
+TargetType TargetType
+IEnumerable<CardKeyword> CanonicalKeywords
+HashSet<CardTag> CanonicalTags
+IEnumerable<DynamicVar> CanonicalVars
+DynamicVarSet DynamicVars
+CardPile Pile
+bool IsPlayable
+Creature CurrentTarget
+```
+
+`CardPlay` 中与打出结果相关的字段/属性：
+
+```csharp
+CardModel Card
+Creature Target
+PileType ResultPile
+ResourceInfo Resources
+bool IsAutoPlay
+int PlayIndex
+int PlayCount
+bool IsFirstInSeries
+bool IsLastInSeries
+```
+
+常用枚举：
+
+```csharp
+CardType: None, Attack, Skill, Power, Status, Curse, Quest
+CardRarity: None, Basic, Common, Uncommon, Rare, Ancient, Event, Token, Status, Curse, Quest
+TargetType: None, Self, AnyEnemy, AllEnemies, RandomEnemy, AnyPlayer, AnyAlly, AllAllies, TargetedNoCreature, Osty
+PileType: None, Draw, Hand, Discard, Exhaust, Play, Deck
+```
+
+### Power/状态字段
+
+`PowerModel` 中与叠层和触发相关的字段/属性：
+
+```csharp
+PowerType Type
+PowerStackType StackType
+int Amount
+int AmountOnTurnStart
+int DisplayAmount
+bool AllowNegative
+Creature Owner
+Creature Target
+DynamicVarSet DynamicVars
+IEnumerable<DynamicVar> CanonicalVars
+IEnumerable<IHoverTip> ExtraHoverTips
+IEnumerable<IHoverTip> HoverTips
+```
+
+常用枚举：
+
+```csharp
+PowerType: None, Buff, Debuff
+PowerStackType: None, Counter, Single
+```
+
+对“可叠层状态/能力”通常使用：
+
+```csharp
+public override PowerStackType StackType => PowerStackType.Counter;
+```
+
+对“唯一存在、刷新或单例能力”通常使用：
+
+```csharp
+public override PowerStackType StackType => PowerStackType.Single;
+```
+
+## 原生 Power 生命周期钩子
+
+与“获得 n 层状态/能力后触发”最相关的钩子：
+
+```csharp
+Task BeforeApplied(Creature target, decimal amount, Creature applier, CardModel cardSource)
+Task AfterApplied(Creature applier, CardModel cardSource)
+Task BeforePowerAmountChanged(PowerModel power, decimal amount, Creature target, Creature applier, CardModel cardSource)
+Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature applier, CardModel cardSource)
+decimal ModifyPowerAmountGiven(PowerModel power, Creature giver, decimal amount, Creature target, CardModel cardSource)
+bool TryModifyPowerAmountReceived(PowerModel canonicalPower, Creature target, decimal amount, Creature applier, out decimal modifiedAmount)
+Task AfterModifyingPowerAmountGiven(PowerModel power)
+Task AfterModifyingPowerAmountReceived(PowerModel power)
+```
+
+用途区分：
+
+`AfterPowerAmountChanged`
+用于“已经获得/减少层数后，按变化量触发另一个效果”。这是本需求的首选。
+
+`BeforePowerAmountChanged`
+用于“层数真正改变前做检查、记录或前置反应”。
+
+`ModifyPowerAmountGiven` / `TryModifyPowerAmountReceived`
+用于“改变将要给予/收到的层数”，例如翻倍、额外加层、Artifact 抵消 Debuff。
+
+`AfterApplied`
+用于“某个 Power 自己被应用后触发自身逻辑”。它更适合写在被应用的 Power 内部，不适合做通用监听器。
+
+## 原生应用 Power 的命令
+
+原生命令入口：
+
+```csharp
+PowerCmd.Apply<TPower>(Creature target, decimal amount, Creature applier, CardModel cardSource, bool silent)
+PowerCmd.Apply(PowerModel power, Creature target, decimal amount, Creature applier, CardModel cardSource, bool silent)
+PowerCmd.ModifyAmount(PowerModel power, decimal offset, Creature applier, CardModel cardSource, bool silent)
+PowerCmd.SetAmount<TPower>(Creature target, decimal amount, Creature applier, CardModel cardSource)
+PowerCmd.Decrement(PowerModel power)
+PowerCmd.Remove<TPower>(Creature creature)
+PowerCmd.Remove(PowerModel power)
+PowerCmd.TickDownDuration(PowerModel power)
+```
+
+BaseLib 常用封装：
+
+```csharp
+CommonActions.ApplySelf<TPower>(choiceContext, card, amount, silent)
+CommonActions.Apply<TPower>(choiceContext, target, card, amount, silent)
+```
+
+卡牌 `OnPlay` 内推荐使用 `CommonActions`；Power hook 内推荐直接使用 `PowerCmd`。
+
+## 卡牌类型分类实现
+
+### Attack 牌
+
+字段组合：
+
+```csharp
+Type = CardType.Attack
+TargetType = TargetType.AnyEnemy / AllEnemies / RandomEnemy
+CanonicalVars = new DamageVar(...)
+ResultPile = Discard // 默认打出后进入弃牌堆，除非被 hook 或卡牌逻辑修改
+```
+
+典型流程：
+
+```csharp
+await CommonActions.CardAttack(this, play).Execute(choiceContext);
+await CommonActions.ApplySelf<VigorPower>(choiceContext, this, 2, false);
+```
+
+适用场景：
+- 先造成伤害，再获得/给予能力。
+- 伤害会吃 `StrengthPower`、`VigorPower` 等伤害修正。
+- 如果“获得 n 层 A -> 激活 n 层 B”是由攻击后获得 A 触发，A/B 仍应走 `PowerModel` 钩子。
+
+### Skill 牌
+
+字段组合：
+
+```csharp
+Type = CardType.Skill
+TargetType = TargetType.Self / AnyEnemy / AnyAlly
+CanonicalVars = new BlockVar(...) / PowerVar<TPower>(...)
+```
+
+典型流程：
+
+```csharp
+await CommonActions.CardBlock(this, play).Execute(choiceContext);
+await CommonActions.ApplySelf<SomePower>(choiceContext, this, amount, false);
+```
+
+适用场景：
+- 自身获得 Buff。
+- 对敌人施加 Debuff。
+- 不走攻击命中流程，不触发 `AfterAttack`。
+
+### Power 牌
+
+字段组合：
+
+```csharp
+Type = CardType.Power
+TargetType = TargetType.Self
+CanonicalVars = new PowerVar<SomePower>(...)
+```
+
+典型流程：
+
+```csharp
+await CommonActions.ApplySelf<SomeListenerPower>(choiceContext, this, amount, false);
+```
+
+适用场景：
+- 打出后获得一个持续监听型能力。
+- “每获得 n 层 A，就激活 n 层 B”最适合做成 Power 牌给予的监听 Power。
+
+### Status 牌
+
+字段组合：
+
+```csharp
+Type = CardType.Status
+Rarity = CardRarity.Status
+```
+
+注意：
+- `CardType.Status` 是卡牌类型，不等价于战斗状态层数。
+- 若需求是“负面状态/能力层数”，应优先建 `PowerModel` 且 `PowerType = Debuff`。
+
+## 原生实现样例
+
+这些原生对象使用了同一类 Power 层数/应用管线，可作为设计参考：
+
+`VigorPower`
+- 类型：`PowerType.Buff`
+- 作用：下一张 Attack 增加伤害。
+- 相关 hook：`BeforeAttack`、`ModifyDamageAdditive`、`AfterAttack`
+- 说明：这是“获得 n 层某能力，并在攻击时消耗/激活”的标准范式。
+
+`ShroudPower`
+- 原生描述：每当给予 Doom，获得 Block。
+- 相关 hook：`AfterPowerAmountChanged`
+- 说明：这是“监听某 Debuff 被给予后触发另一个效果”的范式。
+
+`ViciousPower`
+- 原生描述：每当给予 Vulnerable，抽牌。
+- 相关 hook：`AfterPowerAmountChanged`
+- 说明：与“每获得/给予 n 层某状态后触发效果”结构接近。
+
+`OutbreakPower`
+- 原生描述：每给予 Poison 若干次，对所有敌人造成伤害。
+- 相关 hook：`AfterPowerAmountChanged`
+- 说明：展示了对某类 Power 变化累计计数后触发效果。
+
+`SneckoSkull`
+- 原生描述：每当给予 Poison，额外给予 Poison。
+- 相关 hook：`ModifyPowerAmountGiven`、`AfterModifyingPowerAmountGiven`
+- 说明：这是“改变即将给予的层数”的范式，不是事后触发。
+
+`RuinedHelmet`
+- 原生描述：每场战斗第一次获得 Strength 时，将获得量翻倍。
+- 相关 hook：`TryModifyPowerAmountReceived`、`AfterModifyingPowerAmountReceived`
+- 说明：这是“改变收到层数”的范式。
+
+`UnsettlingLamp`
+- 原生描述：每场战斗第一次打出给予敌人 Debuff 的牌时，将该效果翻倍。
+- 相关 hook：`BeforePowerAmountChanged`
+- 说明：适合参考“限定首次、限定来源卡牌、限定敌方 Debuff”的判断逻辑。
+
+## FF14Combo 推荐实现模板
+
+如果要实现“每获得 n 层 Combo，就获得 n 层 Vigor”：
+
+```csharp
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
+
+public class ComboToVigorPower : FF14ComboPower
+{
+    public override PowerType Type => PowerType.Buff;
+    public override PowerStackType StackType => PowerStackType.Counter;
+
+    public override async Task AfterPowerAmountChanged(
+        PowerModel power,
+        decimal amount,
+        Creature applier,
+        CardModel cardSource)
+    {
+        if (amount <= 0)
+        {
+            return;
+        }
+
+        if (power.Owner != Owner || power is not ComboPower)
+        {
+            return;
+        }
+
+        await PowerCmd.Apply<VigorPower>(Owner, amount, Owner, cardSource, false);
+    }
+}
+```
+
+如果要实现“每给予敌人 n 层某 Debuff，就给予同一敌人 n 层另一 Debuff”：
+
+```csharp
+public override async Task AfterPowerAmountChanged(
+    PowerModel power,
+    decimal amount,
+    Creature applier,
+    CardModel cardSource)
+{
+    if (amount <= 0)
+    {
+        return;
+    }
+
+    if (power.Owner?.Side == Owner.Side)
+    {
+        return;
+    }
+
+    if (power is not VulnerablePower)
+    {
+        return;
+    }
+
+    await PowerCmd.Apply<WeakPower>(power.Owner, amount, Owner, cardSource, false);
+}
+```
+
+防止无限循环：
+- 如果 A 触发 B，B 又可能触发 A，必须加 guard。
+- 可使用私有 bool，例如 `_isResolving`。
+- 或限制只响应特定 `cardSource`、特定 `applier`、特定 `PowerType`。
+
+```csharp
+private bool _isResolving;
+
+public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature applier, CardModel cardSource)
+{
+    if (_isResolving || amount <= 0)
+    {
+        return;
+    }
+
+    if (power is not ComboPower || power.Owner != Owner)
+    {
+        return;
+    }
+
+    _isResolving = true;
+    try
+    {
+        await PowerCmd.Apply<VigorPower>(Owner, amount, Owner, cardSource, false);
+    }
+    finally
+    {
+        _isResolving = false;
+    }
+}
+```
+
+## 字段选择建议
+
+若效果来自卡牌一次性打出：
+
+```csharp
+CardType.Attack / Skill
+OnPlay(...)
+CommonActions.ApplySelf<TPower>(...)
+```
+
+若效果是持续监听：
+
+```csharp
+CardType.Power
+ApplySelf<ListenerPower>
+ListenerPower.AfterPowerAmountChanged(...)
+```
+
+若效果是改变获得量：
+
+```csharp
+ModifyPowerAmountGiven(...)
+TryModifyPowerAmountReceived(...)
+```
+
+若效果是获得后额外触发：
+
+```csharp
+AfterPowerAmountChanged(...)
+PowerCmd.Apply<OtherPower>(..., amount, ...)
+```
+
+## 对 FF14 MOD 的直接映射
+
+Combo 作为可叠层 Buff：
+
+```csharp
+public override PowerType Type => PowerType.Buff;
+public override PowerStackType StackType => PowerStackType.Counter;
+```
+
+Vigor 使用原生：
+
+```csharp
+MegaCrit.Sts2.Core.Models.Powers.VigorPower
+```
+
+卡牌给 Combo/Vigor：
+
+```csharp
+await CommonActions.ApplySelf<VigorPower>(choiceContext, this, 2, false);
+await CommonActions.ApplySelf<ComboPower>(choiceContext, this, 1, false);
+```
+
+如果后续要做“获得 Combo 时按层数触发 Vigor”，不要写在每张 Attack 卡里；应新增一个监听型 Power，统一在 `AfterPowerAmountChanged` 中处理。

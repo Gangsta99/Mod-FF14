@@ -1,4 +1,5 @@
 using Godot;
+using BaseLib.Patches.Localization;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Modding;
 
@@ -15,6 +16,7 @@ public partial class MainFile : Node
     public static void Initialize()
     {
         Logger.Info("FF14 Combo Mod Loaded");
+        SimpleLoc.EnableSimpleLoc(ModId);
 
         //If you want to use scripts defined in your mod for Godot scenes, uncomment the following line.
         //Godot.Bridge.ScriptManagerBridge.LookupScriptsInAssembly(Assembly.GetExecutingAssembly());
