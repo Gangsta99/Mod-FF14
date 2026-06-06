@@ -1,0 +1,16 @@
+{
+  "FF14COMBO-KNIGHT.title": "奥尔什方",
+  "FF14COMBO-KNIGHT.titleObject": "骑士",
+  "FF14COMBO-KNIGHT.description": "‘父亲，一名骑士理应尽到自己的职责。’",
+  "FF14COMBO-KNIGHT.pronounObject": "他",
+  "FF14COMBO-KNIGHT.pronounSubject": "他",
+  "FF14COMBO-KNIGHT.pronounPossessive": "他的",
+  "FF14COMBO-KNIGHT.possessiveAdjective": "他的",
+  "FF14COMBO-KNIGHT.aromaPrinciple": "钢铁",
+  "FF14COMBO-KNIGHT.banter.alive.endTurnPing": "准备就绪。",
+  "FF14COMBO-KNIGHT.banter.dead.endTurnPing": "……",
+  "FF14COMBO-KNIGHT.eventDeathPrevention": "还没结束。",
+  "FF14COMBO-KNIGHT.goldMonologue": "这会派上用场。",
+  "FF14COMBO-KNIGHT.cardsModifierTitle": "骑士卡牌",
+  "FF14COMBO-KNIGHT.cardsModifierDescription": "骑士牌池中的卡牌。"
+}
