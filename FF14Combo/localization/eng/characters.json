@@ -1,0 +1,16 @@
+{
+  "FF14COMBO-KNIGHT.title": "Knight",
+  "FF14COMBO-KNIGHT.titleObject": "the Knight",
+  "FF14COMBO-KNIGHT.description": "A steadfast swordfighter who builds momentum through combos.",
+  "FF14COMBO-KNIGHT.pronounObject": "him",
+  "FF14COMBO-KNIGHT.pronounSubject": "he",
+  "FF14COMBO-KNIGHT.pronounPossessive": "his",
+  "FF14COMBO-KNIGHT.possessiveAdjective": "his",
+  "FF14COMBO-KNIGHT.aromaPrinciple": "steel",
+  "FF14COMBO-KNIGHT.banter.alive.endTurnPing": "Ready.",
+  "FF14COMBO-KNIGHT.banter.dead.endTurnPing": "...",
+  "FF14COMBO-KNIGHT.eventDeathPrevention": "Not yet.",
+  "FF14COMBO-KNIGHT.goldMonologue": "This will serve.",
+  "FF14COMBO-KNIGHT.cardsModifierTitle": "Knight Cards",
+  "FF14COMBO-KNIGHT.cardsModifierDescription": "Cards from the Knight's card pool."
+}

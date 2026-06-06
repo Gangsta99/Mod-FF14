@@ -1,6 +1,15 @@
 {
   "FF14COMBO-FAST_BLADE_CARD.title": "先锋剑",
   "FF14COMBO-FAST_BLADE_CARD.description": "造成!D!点伤害。附加2点活力。获得连击1层",
+<<<<<<< HEAD
+  "FF14COMBO-FIGHT_OR_FIGHT_CARD.title": "战逃反应",
+  "FF14COMBO-FIGHT_OR_FIGHT_CARD.description": "可消耗三层连击，获得6点活力。",
+  "FF14COMBO-JUST_BEAT_IT_CARD.title": "蘸豆",
+  "FF14COMBO-JUST_BEAT_IT_CARD.description": "只有当你的连击层数大于等于三层时，才能打出。转换3层连击，获得6点活力。",
+  "FF14COMBO-RAGE_OF_HALONE_CARD.title": "战女神之怒",
+  "FF14COMBO-RAGE_OF_HALONE_CARD.description": "造成!D!点伤害。获得1层连击，获得4点活力。",
+=======
+>>>>>>> 8bcb888286f96e05c566463d647abd737a61aa92
   "FF14COMBO-RIOT_BLADE_CARD.title": "暴怒剑",
   "FF14COMBO-RIOT_BLADE_CARD.description": "造成!D!点伤害。附加2点活力。获得连击1层"
 }
