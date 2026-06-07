@@ -32,7 +32,6 @@ High quality big:    1000 x 760 px
 Current and planned card filenames:
 
 ```text
-opener_card.png
 continuation_slash_card.png
 finisher_card.png
 damage_boost_card.png
@@ -42,7 +41,6 @@ positioning_card.png
 The file naming rule is:
 
 ```text
-OpenerCard -> opener_card.png
 ContinuationSlashCard -> continuation_slash_card.png
 FinisherCard -> finisher_card.png
 DamageBoostCard -> damage_boost_card.png

@@ -1,21 +1,12 @@
 {
-  "FF14COMBO-F_F14_TEST_CARD.title": "FF14 Test Card",
-  "FF14COMBO-F_F14_TEST_CARD.description": "Test card. NL Logs a message when played.",
-  "FF14COMBO-FAST_BLADE_CARD.title": "先锋剑",
-  "FF14COMBO-FAST_BLADE_CARD.description": "造成!D!点伤害。附加2点活力。获得连击1层",
-<<<<<<< HEAD
-  "FF14COMBO-FIGHT_OR_FIGHT_CARD.title": "Fight or Fight",
+  "FF14COMBO-FAST_BLADE_CARD.title": "Fast Blade",
+  "FF14COMBO-FAST_BLADE_CARD.description": "Deal !D! damage. Gain 2 Vigor. Gain 1 Combo.",
+  "FF14COMBO-FIGHT_OR_FIGHT_CARD.title": "Fight-or-flight Response",
   "FF14COMBO-FIGHT_OR_FIGHT_CARD.description": "Consume 3 Combo to gain 6 Vigor.",
-  "FF14COMBO-JUST_BEAT_IT_CARD.title": "Just beat it",
+  "FF14COMBO-JUST_BEAT_IT_CARD.title": "Just Beat It",
   "FF14COMBO-JUST_BEAT_IT_CARD.description": "Can only be played if you have at least 3 Combo. Convert 3 Combo into 6 Vigor.",
-  "FF14COMBO-OPENER_CARD.title": "Opener",
-  "FF14COMBO-OPENER_CARD.description": "Deal !D! damage.",
   "FF14COMBO-RAGE_OF_HALONE_CARD.title": "Rage of Halone",
   "FF14COMBO-RAGE_OF_HALONE_CARD.description": "Deal !D! damage. Gain 1 Combo. Gain 4 Vigor.",
-=======
-  "FF14COMBO-OPENER_CARD.title": "Opener",
-  "FF14COMBO-OPENER_CARD.description": "Deal !D! damage.",
->>>>>>> 8bcb888286f96e05c566463d647abd737a61aa92
-  "FF14COMBO-RIOT_BLADE_CARD.title": "暴怒剑",
-  "FF14COMBO-RIOT_BLADE_CARD.description": "造成!D!点伤害。附加2点活力。获得连击1层"
+  "FF14COMBO-RIOT_BLADE_CARD.title": "Riot Blade",
+  "FF14COMBO-RIOT_BLADE_CARD.description": "Deal !D! damage. Gain 2 Vigor. Gain 1 Combo."
 }
