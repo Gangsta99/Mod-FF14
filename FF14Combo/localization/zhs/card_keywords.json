@@ -1,0 +1,10 @@
+{
+  "FF14COMBO-COMBO.title": "连击",
+  "FF14COMBO-COMBO.description": "打出时，获得1层连击。",
+  "FF14COMBO-BLEEDING.title": "流血",
+  "FF14COMBO-BLEEDING.description": "以敌人为目标打出时，对其附加卡牌所标注层数的流血。",
+  "FF14COMBO-SINGLETARGETCOMBO.title": "单体连击",
+  "FF14COMBO-SINGLETARGETCOMBO.description": "单体连击出牌顺序为先锋剑-暴怒剑-战女神之怒。",
+  "FF14COMBO-AREATARGETCOMBO.title": "群体连击",
+  "FF14COMBO-AREATARGETCOMBO.description": "群体连击出牌顺序为全蚀斩-日蚀斩。"
+}

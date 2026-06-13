@@ -5,12 +5,16 @@ using FF14Combo.FF14ComboCode.Extensions;
 using FF14Combo.FF14ComboCode.Relics;
 using Godot;
 using MegaCrit.Sts2.Core.Entities.Characters;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Factories;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Characters;
 using MegaCrit.Sts2.Core.Models.PotionPools;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Runs;
 
 namespace FF14Combo.FF14ComboCode.Characters;
 
@@ -26,11 +30,18 @@ public class Knight : CustomCharacterModel
     public override RelicPoolModel RelicPool => Ironclad.RelicPool;
 
     public override IEnumerable<CardModel> StartingDeck =>
-        Ironclad.StartingDeck.Concat([
-            ModelDb.Card<FastBladeCard>(),
-            ModelDb.Card<RiotBladeCard>(),
-            ModelDb.Card<RageOfHaloneCard>()
-        ]);
+        [
+            ModelDb.Card<DefendKnightCard>(),
+            ModelDb.Card<DefendKnightCard>(),
+            ModelDb.Card<DefendKnightCard>(),
+            ModelDb.Card<DefendKnightCard>(),
+            ModelDb.Card<DefendKnightCard>(),
+            ModelDb.Card<StrikeKnightCard>(),
+            ModelDb.Card<StrikeKnightCard>(),
+            ModelDb.Card<StrikeKnightCard>(),
+            ModelDb.Card<StrikeKnightCard>(),
+            ModelDb.Card<FastBladeCard>()
+        ];
 
     public override IReadOnlyList<RelicModel> StartingRelics =>
         [ModelDb.Relic<SoulOfThePaladin>()];
@@ -68,5 +79,32 @@ public class Knight : CustomCharacterModel
     public override List<string> GetArchitectAttackVfx()
     {
         return Ironclad.GetArchitectAttackVfx();
+    }
+
+    public override bool TryModifyCardRewardOptions(
+        Player player,
+        List<CardCreationResult> cardRewardOptions,
+        CardCreationOptions creationOptions)
+    {
+        if (creationOptions.Source != CardCreationSource.Encounter ||
+            creationOptions.RarityOdds != CardRarityOddsType.BossEncounter ||
+            player.RunState.CurrentActIndex != 0 ||
+            PileType.Deck.GetPile(player).Cards.Any(card => card is RequiescatCard) ||
+            cardRewardOptions.Any(result => result.Card is RequiescatCard))
+        {
+            return false;
+        }
+
+        var requiescat = player.RunState.CreateCard(ModelDb.Card<RequiescatCard>(), player);
+        if (cardRewardOptions.Count == 0)
+        {
+            cardRewardOptions.Add(new CardCreationResult(requiescat));
+        }
+        else
+        {
+            cardRewardOptions[0] = new CardCreationResult(requiescat);
+        }
+
+        return true;
     }
 }

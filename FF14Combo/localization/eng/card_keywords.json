@@ -1,4 +1,10 @@
 {
   "FF14COMBO-COMBO.title": "Combo",
-  "FF14COMBO-COMBO.description": "When played, gain 1 Combo."
+  "FF14COMBO-COMBO.description": "When played, gain 1 Combo.",
+  "FF14COMBO-BLEEDING.title": "Bleeding",
+  "FF14COMBO-BLEEDING.description": "When played against an enemy, apply the card's listed amount of Bleeding.",
+  "FF14COMBO-SINGLETARGETCOMBO.title": "Single-target Combo",
+  "FF14COMBO-SINGLETARGETCOMBO.description": "Play order: Fast Blade - Riot Blade - Rage of Halone.",
+  "FF14COMBO-AREATARGETCOMBO.title": "Area-target Combo",
+  "FF14COMBO-AREATARGETCOMBO.description": "Play order: Total Eclipse - Prominence."
 }

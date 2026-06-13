@@ -3,6 +3,7 @@ using BaseLib.Extensions;
 using BaseLib.Utils;
 using FF14Combo.FF14ComboCode.Extensions;
 using FF14Combo.FF14ComboCode.Powers;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
@@ -30,5 +31,23 @@ public abstract class FF14ComboCard(int cost, CardType type, CardRarity rarity, 
         {
             await CommonActions.ApplySelf<ComboPower>(choiceContext, this, 1, false);
         }
+    }
+
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        if (cardPlay.Card != this ||
+            !Keywords.Contains(FF14ComboKeywords.Bleeding) ||
+            Owner?.Creature?.IsPlayer != true ||
+            cardPlay.Target?.IsEnemy != true ||
+            !cardPlay.Target.IsAlive)
+        {
+            return;
+        }
+
+        var bleedingAmount = DynamicVars.TryGetValue(nameof(BleedingPower), out var bleedingVar)
+            ? bleedingVar.BaseValue
+            : 1m;
+
+        await PowerCmd.Apply<BleedingPower>(cardPlay.Target, bleedingAmount, Owner.Creature, this);
     }
 }

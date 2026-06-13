@@ -1,0 +1,17 @@
+{
+  "FF14COMBO-COMBO_POWER.title": "连击",
+  "FF14COMBO-COMBO_POWER.description": "在你的回合结束时减少1层。",
+  "FF14COMBO-COMBO_POWER.smartDescription": "在你的回合结束时减少1层。",
+  "FF14COMBO-BLEEDING_POWER.title": "流血",
+  "FF14COMBO-BLEEDING_POWER.description": "该敌人行动前，失去等同于流血层数的生命。其回合结束时，流血减少1层。",
+  "FF14COMBO-BLEEDING_POWER.smartDescription": "该敌人行动前，失去{Amount}点生命。其回合结束时，流血减少1层。",
+  "FF14COMBO-PRECISION_COMBO_POWER.title": "精准连击",
+  "FF14COMBO-PRECISION_COMBO_POWER.description": "按指定连击顺序连续打出攻击牌时，除第一张外的攻击牌伤害增加50%。",
+  "FF14COMBO-PRECISION_COMBO_POWER.smartDescription": "按指定连击顺序连续打出攻击牌时，除第一张外的攻击牌伤害增加50%。",
+  "FF14COMBO-REDEMPTION_SWORD_POWER.title": "偿赎剑",
+  "FF14COMBO-REDEMPTION_SWORD_POWER.description": "下回合开始时，对{TargetName}造成等同于所有玩家本回合失去生命总量的伤害。",
+  "FF14COMBO-REDEMPTION_SWORD_POWER.smartDescription": "下回合开始时，对{TargetName}造成{RetaliationDamage}点伤害。",
+  "FF14COMBO-REQUIESCAT_PRAYER_POWER.title": "安魂祈祷",
+  "FF14COMBO-REQUIESCAT_PRAYER_POWER.description": "允许打出安魂剑技。你的回合结束时减少1层。",
+  "FF14COMBO-REQUIESCAT_PRAYER_POWER.smartDescription": "允许打出安魂剑技。你的回合结束时减少1层。"
+}

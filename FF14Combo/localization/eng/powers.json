@@ -1,5 +1,17 @@
 {
   "FF14COMBO-COMBO_POWER.title": "Combo",
   "FF14COMBO-COMBO_POWER.description": "Decreases by 1 at the end of your turn.",
-  "FF14COMBO-COMBO_POWER.smartDescription": "Decreases by 1 at the end of your turn."
+  "FF14COMBO-COMBO_POWER.smartDescription": "Decreases by 1 at the end of your turn.",
+  "FF14COMBO-BLEEDING_POWER.title": "Bleeding",
+  "FF14COMBO-BLEEDING_POWER.description": "Before this enemy acts, it loses HP equal to its Bleeding. At the end of its turn, Bleeding is reduced by 1.",
+  "FF14COMBO-BLEEDING_POWER.smartDescription": "Before this enemy acts, it loses {Amount} HP. At the end of its turn, Bleeding is reduced by 1.",
+  "FF14COMBO-PRECISION_COMBO_POWER.title": "Precision Combo",
+  "FF14COMBO-PRECISION_COMBO_POWER.description": "Consecutive Attacks in a defined combo deal 50% more damage after the first Attack.",
+  "FF14COMBO-PRECISION_COMBO_POWER.smartDescription": "Consecutive Attacks in a defined combo deal 50% more damage after the first Attack.",
+  "FF14COMBO-REDEMPTION_SWORD_POWER.title": "Redemption Sword",
+  "FF14COMBO-REDEMPTION_SWORD_POWER.description": "At the start of your next turn, deal the HP lost by ALL players this turn to {TargetName}.",
+  "FF14COMBO-REDEMPTION_SWORD_POWER.smartDescription": "At the start of your next turn, deal {RetaliationDamage} damage to {TargetName}.",
+  "FF14COMBO-REQUIESCAT_PRAYER_POWER.title": "Requiescat Prayer",
+  "FF14COMBO-REQUIESCAT_PRAYER_POWER.description": "Allows Requiescat blades to be played. Decreases by 1 at the end of your turn.",
+  "FF14COMBO-REQUIESCAT_PRAYER_POWER.smartDescription": "Allows Requiescat blades to be played. Decreases by 1 at the end of your turn."
 }
